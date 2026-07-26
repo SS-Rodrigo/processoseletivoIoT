@@ -8,7 +8,7 @@ BUTTON_PIN = 25
 LUX_BLOQUEADO = 100
 LUX_LIVRE = 500
 
-MICRO_PARADA_MS = 5000
+MICRO_PARADA_MS = 4500
 
 DEBOUNCE_MS = 50
 
@@ -122,7 +122,7 @@ def verificar_sensor():
         if inicio_bloqueio is not None:
             tempo_bloqueado = time.ticks_diff(agora, inicio_bloqueio)
 
-            if (tempo_bloqueado > MICRO_PARADA_MS and not micro_parada_reportada):
+            if (tempo_bloqueado >= MICRO_PARADA_MS and not micro_parada_reportada):
                 print("Alerta: Micro-parada detectada!")
                 micro_parada_reportada = True
     elif sensor_bloqueado and lux > LUX_LIVRE: # Transição: sensor bloqueado -> linha livre
@@ -141,3 +141,4 @@ print("Contador de Producao Inicializado")
 while True:
     verificar_sensor()
     verificar_botao()
+    time.sleep_ms(20)
