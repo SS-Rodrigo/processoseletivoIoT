@@ -44,7 +44,7 @@ def ler_lux():
     tensao = leitura / 4095.0 * 3.3
 
     # Resistência aproximada do fotoresistor no divisor de tensão
-    resistencia = 2000.0 * tensao / (3.3 - tensao / 3.3)
+    resistencia = 2000.0 * tensao / (1.0 - tensao / 3.3)
 
     if resistencia <= 0:
         return 100000.0
