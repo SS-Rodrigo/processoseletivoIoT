@@ -2,6 +2,62 @@
   "version": 1,
   "author": "Uri Shaked",
   "editor": "wokwi",
-  "parts": [ { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} } ],
-  "connections": [ [ "esp:TX", "$serialMonitor:RX", "", [] ], [ "esp:RX", "$serialMonitor:TX", "", [] ] ]
+  "parts": [ { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-photoresistor-sensor", "id": "ldr1", "top": -115.2, "left": 230.4, "attrs": { "lux": "800" } },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 172.6,
+      "left": 249.6,
+      "attrs": {
+        "color": "red",
+        "label": "RESET"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "ldr1:VCC",
+      "esp:3V3",
+      "red",
+      []
+    ],
+    [
+      "ldr1:GND",
+      "esp:GND.1",
+      "black",
+      []
+    ],
+    [
+      "ldr1:AO",
+      "esp:34",
+      "green",
+      []
+    ],
+    [
+      "btn1:1.l",
+      "esp:25",
+      "blue",
+      []
+    ],
+    [
+      "btn1:2.l",
+      "esp:GND.2",
+      "black",
+      []
+    ],
+    [
+      "esp:TX",
+      "$serialMonitor:RX",
+      "",
+      []
+    ],
+    [
+      "esp:RX",
+      "$serialMonitor:TX",
+      "",
+      []
+    ]
+  ],
+  "dependencies": {}
 }
