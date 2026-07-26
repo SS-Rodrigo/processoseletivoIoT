@@ -8,7 +8,7 @@ BUTTON_PIN = 25
 LUX_BLOQUEADO = 100
 LUX_LIVRE = 500
 
-MICRO_PARADA_MS = 4500
+MICRO_PARADA_MS = 5200
 
 DEBOUNCE_MS = 50
 
@@ -135,7 +135,7 @@ def verificar_sensor():
         micro_parada_reportada = False
 
 # Programa principal
-print("Sistema Kanban Inicializado")
+#print("Sistema Kanban Inicializado")
 print("Contador de Producao Inicializado") 
 
 while True:
