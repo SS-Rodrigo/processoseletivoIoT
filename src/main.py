@@ -136,7 +136,7 @@ def verificar_sensor():
 
 # Programa principal
 print("Sistema Kanban Inicializado")
-print("Contador de Producao Inicializado")
+print("Contador de Producao Inicializado") 
 
 while True:
     verificar_sensor()
