@@ -72,38 +72,6 @@ def resetar_turno():
     print("Turno resetado com sucesso. Contadores zerados.")
 
 def verificar_botao():
-    """
-    Realiza a leitura do botão com debounce.
-
-    Como o botão usa PULL_UP:
-    1 = solto
-    0 = pressionado
-    """
-    global ultimo_estado_lido_botao
-    global estado_estavel_botao
-    global momento_ultima_mudanca_botao
-
-    agora = time.ticks_ms()
-    leitura_atual = botao.value()
-
-    if leitura_atual != ultimo_estado_lido_botao:
-        ultimo_estado_lido_botao = leitura_atual
-        momento_ultima_mudanca_botao = agora
-
-    tempo_estavel = time.ticks_diff(
-        agora,
-        momento_ultima_mudanca_botao
-    )
-
-    if tempo_estavel >= DEBOUNCE_MS:
-        if leitura_atual != estado_estavel_botao:
-            estado_estavel_botao = leitura_atual
-
-            # Executa o reset somente na transição para pressionado
-            if estado_estavel_botao == 0:
-                resetar_turno()
-
-def verificar_botao():
     global ultimo_estado_lido_botao
     global estado_estavel_botao
     global momento_ultima_mudanca_botao
@@ -137,6 +105,38 @@ def verificar_botao():
         elif estado_estavel_botao == 1 and botao_foi_pressionado:
             botao_foi_pressionado = False
             resetar_turno()
+
+def verificar_sensor():
+    #Detecta a passsagem das peças e as micro-paradas.
+
+    global total_pecas
+    global sensor_bloqueado
+    global inicio_bloqueio
+    global micro_parada_reportada
+
+    agora = time.ticks_ms()
+    lux = ler_lux()
+
+    # Transição: linha livre para sensor bloqueado
+    if not sensor_bloqueado and lux < LUX_BLOQUEADO:
+        sensor_bloqueado = True
+        inicio_bloqueio = agora
+        micro_parada_reportada = False
+    elif sensor_bloqueado and lux < LUX_BLOQUEADO: # Sensor continua bloqueado
+        if inicio_bloqueio is not None:
+            tempo_bloqueado = time.ticks_diff(agora, inicio_bloqueio)
+
+            if (tempo_bloqueado >= MICRO_PARADA_MS and not micro_parada_reportada):
+                print("Alerta: Micro-parada detectada!")
+                micro_parada_reportada = True
+    elif sensor_bloqueado and lux > LUX_LIVRE: # Transição: sensor bloqueado -> linha livre
+        total_pecas += 1
+
+        print("Peca detectada! Total: {}".format(total_pecas))
+
+        sensor_bloqueado = False
+        inicio_bloqueio = None
+        micro_parada_reportada = False
 
 # Programa principal
 #print("Sistema Kanban Inicializado")
