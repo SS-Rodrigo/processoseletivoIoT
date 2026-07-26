@@ -10,7 +10,7 @@ LUX_LIVRE = 500
 
 MICRO_PARADA_MS = 5200
 
-DEBOUNCE_MS = 250
+DEBOUNCE_MS = 50
 
 GAMMA = 0.7
 RL10 = 50
@@ -25,6 +25,7 @@ total_pecas = 0
 sensor_bloqueado = False
 inicio_bloqueio = None
 micro_parada_reportada = False
+botao_foi_pressionado = False
 
 ultimo_estado_lido_botao = botao.value()
 estado_estavel_botao = ultimo_estado_lido_botao
@@ -102,37 +103,40 @@ def verificar_botao():
             if estado_estavel_botao == 0:
                 resetar_turno()
 
-def verificar_sensor():
-    #Detecta a passsagem das peças e as micro-paradas.
-
-    global total_pecas
-    global sensor_bloqueado
-    global inicio_bloqueio
-    global micro_parada_reportada
+def verificar_botao():
+    global ultimo_estado_lido_botao
+    global estado_estavel_botao
+    global momento_ultima_mudanca_botao
+    global botao_foi_pressionado
 
     agora = time.ticks_ms()
-    lux = ler_lux()
+    leitura_atual = botao.value()
 
-    # Transição: linha livre para sensor bloqueado
-    if not sensor_bloqueado and lux < LUX_BLOQUEADO:
-        sensor_bloqueado = True
-        inicio_bloqueio = agora
-        micro_parada_reportada = False
-    elif sensor_bloqueado and lux < LUX_BLOQUEADO: # Sensor continua bloqueado
-        if inicio_bloqueio is not None:
-            tempo_bloqueado = time.ticks_diff(agora, inicio_bloqueio)
+    # Detecta mudança na leitura bruta
+    if leitura_atual != ultimo_estado_lido_botao:
+        ultimo_estado_lido_botao = leitura_atual
+        momento_ultima_mudanca_botao = agora
 
-            if (tempo_bloqueado >= MICRO_PARADA_MS and not micro_parada_reportada):
-                print("Alerta: Micro-parada detectada!")
-                micro_parada_reportada = True
-    elif sensor_bloqueado and lux > LUX_LIVRE: # Transição: sensor bloqueado -> linha livre
-        total_pecas += 1
+    tempo_estavel = time.ticks_diff(
+        agora,
+        momento_ultima_mudanca_botao
+    )
 
-        print("Peca detectada! Total: {}".format(total_pecas))
+    # Confirma a mudança após o debounce
+    if (
+        tempo_estavel >= DEBOUNCE_MS
+        and leitura_atual != estado_estavel_botao
+    ):
+        estado_estavel_botao = leitura_atual
 
-        sensor_bloqueado = False
-        inicio_bloqueio = None
-        micro_parada_reportada = False
+        # Com PULL_UP, zero significa pressionado
+        if estado_estavel_botao == 0:
+            botao_foi_pressionado = True
+
+        # Executa o reset quando o botão é liberado
+        elif estado_estavel_botao == 1 and botao_foi_pressionado:
+            botao_foi_pressionado = False
+            resetar_turno()
 
 # Programa principal
 #print("Sistema Kanban Inicializado")
