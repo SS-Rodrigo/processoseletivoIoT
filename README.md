@@ -287,6 +287,8 @@ Descreva, em poucas palavras:
 - O que o sistema embarcado simulado faz
 - Como o usuário interage com ele (se aplicável)
 
+O objetivo desse projeto é desenvolver um sistema que utilize um sensor óptico baseado em fotorresistor (LDR) para monitorar a passagem de objetos. O sistema monitora a passagem de objetos por meio da detecção pelo sensor óptico da presença ou ausência de luz, onde a ausencia de luz significa a passagem de um objeto obstruindo a detecção da luz pelo sensor. O usuário pode interagir com o sistema por meio da vizualização de informações enviadas pelo mesmo e por meio do botão que reseta o sistema.
+
 ---
 
 ## Arquitetura do Sistema Embarcado
@@ -299,6 +301,18 @@ Explique a arquitetura lógica do seu projeto, abordando:
 
 Se desejar, utilize tópicos ou um pequeno diagrama em texto.
 
+O programa é executado pelo ESP32 e possui como função principal monitorar um sensor para 
+detectar a passagem de objetos, identificar micro-paradas e permitir o reset do contador 
+por meio de um botão.
+Após a inicialização do sistema, são configurados o sensor como entrada analógica e o botão de 
+reset como entrada digital com resistor pull-up interno. Em seguida, é exibida a mensagem de 
+inicialização no monitor serial.
+O programa entra em um laço infinito (while True), no qual são executadas duas funções principais:
+
+. verificar_sensor(): realiza a leitura do sensor LDR, detecta a passagem de peças e verifica a ocorrência de micro-paradas.
+. verificar_botao(): monitora o botão de reset utilizando debounce para evitar leituras falsas.
+
+As temporizações utilizam time.ticks_ms() e time.ticks_diff(), permitindo medir o tempo de bloqueio do sensor sem interromper a execução do programa. O botão utiliza debounce de 50 ms para eliminar oscilações mecânicas.
 ---
 
 ## Componentes Utilizados na Simulação
@@ -308,6 +322,13 @@ Liste os principais componentes definidos no `diagram.json`, por exemplo:
 - Tipo de placa utilizada
 - LEDs, botões, sensores, atuadores, etc.
 - Função de cada componente no sistema
+
+Componentes utilizados:
+
+. ESP32: Gerencia o funcionamento do sistema.
+. Sensor óptico: Detecta a presença ou ausência de luz.
+. Botão: Reseta o sistema.
+. Saída serial: Trasmitir informações do sistema.
 
 ---
 
@@ -319,6 +340,10 @@ Explique brevemente decisões importantes tomadas durante o desenvolvimento, com
 - Uso de funções, estados ou constantes
 - Estratégias para temporização ou controle lógico
 
+Constantes foram usadas para evitar a alteração de alguns valores durante a execução do programa. Funções foram usadas para realizar cada tarefa necessária para o funcionamento do sistema, com o intuito de deixar o código mais organizado e facilitar correções.
+A biblioteca time foi utilizada para a realização de tarefas envolvendo temporização.
+Estruturas de decisão foram utilizadas para mudar o fluxo do programa.
+
 ---
 
 ## Resultados Obtidos
@@ -328,6 +353,13 @@ Descreva o comportamento final do sistema:
 - O que funciona corretamente
 - Quais requisitos foram atendidos
 - Resultado observado na simulação do Wokwi
+
+Os 3 teste foram reslizados com sucesso.
+Os requisitos de hardware foram atendidos.
+
+1° Teste: Detectou a passagem da peça e realizou a sua contagem.
+2° Teste: Detectou a micro-parada.
+3° Teste: Detectou o aperto no botão e realizou o reset
 
 ---
 

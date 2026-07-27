@@ -145,4 +145,3 @@ print("Contador de Producao Inicializado")
 while True:
     verificar_sensor()
     verificar_botao()
-    time.sleep_ms(20)
